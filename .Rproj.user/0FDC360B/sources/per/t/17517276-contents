@@ -1,0 +1,541 @@
+---
+title: "Untitled"
+author: "Ping"
+date: '2023-04-27'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+title: "How to effectively persuade US parents with vaccine hesitancy: The case study of MMR vaccination"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    social: menu
+    source_code: https://ping-wongphothiphan.github.io/EDLD652-Final_project/
+
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(gghighlight)
+library(here)
+library(gganimate)
+library(magick)
+
+data <- read_csv(here("data.csv"))
+```
+
+Introduction
+=======================================
+
+Row {data-height=500}
+---------------------------------------------------------
+### **Research Background and Significance:**
+
+Vaccine hesitancy is ranked as one of the top ten global health threats by World Health Organization (WHO) in 2019. One of the most skeptical childhood vaccines is the measles, mumps, and rubella (MMR) vaccine. This can be reflected by the surge of measles cases across the U.S. From January 1 to August 22, 2019, 1,282 individual cases of measles have been confirmed in 31 states. This is the greatest number of cases reported in the U.S. since 1992 and since measles was declared eliminated in 2000.
+
+Believing in conspiracy was found to associate with vaccine hesitancy across cultures. In other words, the more conspiracy beliefs an individual holds, the higher likelihood the person is hesitant in vaccination.
+
+
+
+### **Objectives:**
+
+This study aims to investigate whether different formats of message influence:
+
+a) parents’ intention to vaccinate their child against measles 
+b) parents’ risk perception toward MMR vaccination.
+
+
+Row {data-height=500}
+---------------------------------------------------------
+### **Research Method:**
+
+This study is an online experiment targeting only participants who identify themselves as:
+
+1) being a parent of a child aged 0-6 year-old
+2) residing in the U.S.
+3) thinking that MMR vaccine or vaccines in general is unsafe. 
+
+A total of 438 participants were randomly assigned to read one of the following message formats:
+
+1)	Control (n = 107)—no exposure to any message
+2)	Fact (n = 111)—an article providing scientific facts and statistical information
+3)	Narrative (n = 111)—a story of a mother who successfully vaccinate her child
+4)	Hybrid (n = 109)—a story of a mother who successfully vaccinate her child, coupled up with scientific facts and statistical information.
+
+
+Research Results
+=======================================
+
+Sidebar Title {.sidebar data-width=400}
+-----------------------------------------------------------------------
+The graphs in the upper row are the final version of the two graphs in the bottom row. Two differences between the initial and the final versions are the regression lines and the animation function. 
+
+The regression lines of each condition were added to visualize the slope so that the audience could compare the means of outcomes (i.e., vaccination intention and risk perception) at the same level of general conspiracy beliefs across experimental conditions.
+
+The purpose of adding animation is to explicitly show the difference of response patterns across experimental conditions. 
+
+
+
+Row {.tabset data-height=600}
+-----------------------------------------------------------------------
+
+### Animated plot for **MMR vaccination intention** of each message format
+
+```{r}
+plot1.anim <- ggplot(data, aes(x = GenConBlf, y =VacIntMMR))+
+  geom_point(aes(color = Condition), alpha = .4, position = "jitter")+
+  geom_smooth(aes(color = Condition), method = "lm", se = FALSE)+
+  labs(title = "Do message formats enhance parents' vaccination intention?",
+       subtitle = "Vaccination intention after reading {closest_state} message",
+       x = "Level of general conspiracy belief",
+       y = "MMR vaccination intention")+
+  scale_x_continuous(labels = c("None", 
+                                " ", 
+                                "Moderate", 
+                                " ", 
+                                "A lot"), 
+                     breaks = 1:5, limits = c(1,5))+
+  scale_color_manual(values = c("orchid", "salmon", "darkturquoise", "chartreuse3"),
+                     name = "Message Type", 
+                     breaks =  c("Control", "Fact", "Narrative", "Hybrid"),
+                     labels = c("No exposure", "Scientific Fact", "Narrative", "Hybrid"))+
+  scale_y_continuous(labels = c("Definitely\nwill not", 
+                                " ", 
+                                "Maybe,\n Maybe not", 
+                                " ", 
+                                "Definitely\nwill"), 
+                     breaks = 1:5, limits = c(1,5))+
+  transition_states(Condition,
+                    transition_length = 2,
+                    state_length = 2) +
+  enter_fade() +
+  enter_grow() +
+  exit_fade() +
+  exit_shrink() +
+  ease_aes() +
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.2))
+
+
+animate(plot1.anim, renderer = magick_renderer())
+```
+
+### Animated plot for **risk perception of MMR vaccine** of each message format
+
+```{r}
+plot1_rsk.anim <- ggplot(data, aes(x = GenConBlf, y = RskMmrVac))+
+  geom_point(aes(color = Condition), alpha = .5, position = "jitter")+
+  geom_smooth(aes(color = Condition), method = "lm", se = FALSE)+
+  labs(title = "Do message formats lower parents' risk perception toward MMR vaccine?",
+       subtitle = "Risk perception after reading {closest_state} message",
+       x = "Level of general conspiracy belief",
+       y = "Risk perception toward MMR vaccine")+
+  scale_x_continuous(labels = c("None", 
+                                " ", 
+                                "Moderate", 
+                                " ", 
+                                "A lot"), 
+                     breaks = 1:5, limits = c(1,5))+
+ scale_y_continuous(labels = c("Not at all\nrisky", 
+                                " ", 
+                                "Moderately\nrisky", 
+                                " ", 
+                                "Extremely\nrisky"),
+                     breaks = 1:5, limits = c(1,5)) +
+  scale_color_manual(values = c("#9c2ea1", "#fd9301", "#601700", "#db162f"),
+                     name = "Message Type", 
+                     breaks =  c("Control", "Fact", "Narrative", "Hybrid"),
+                     labels = c("No exposure", "Scientific Fact", "Narrative", "Hybrid"))+
+  transition_states(Condition,
+                    transition_length = 2,
+                    state_length = 1) +
+  enter_fade() +
+  enter_grow() +
+  exit_fade() +
+  exit_shrink() +
+  ease_aes() +
+  theme_minimal()
+
+
+animate(plot1_rsk.anim, renderer = magick_renderer())
+
+```
+
+
+Row {data-height=400}
+---------------------------------------------------------
+### **MMR vaccination intention** across all message formats
+
+```{r}
+data %>% ggplot(aes(GenConBlf, VacIntMMR))+
+  geom_point(aes(color = Condition), alpha = .5, position = "jitter")+
+  labs(x = "Level of general conspiracy belief",
+       y = "MMR vaccination intention")+
+  scale_y_continuous(labels = c("Definitely\nwill not", " ", "Maybe,\n Maybe not", " ", "Definitely\nwill"), 
+                     breaks = 1:5, limits = c(1,5))+
+  scale_x_continuous(labels = c("None", " ", "Moderate", " ", "A lot"),
+                     breaks = 1:5, limits = c(1,5))+
+  scale_color_manual(values = c("orchid", "salmon", "darkturquoise", "chartreuse3"),
+                     name = "Message Type", 
+                     breaks =  c("Control", "Fact", "Narrative", "Hybrid"),
+                     labels = c("No exposure", "Scientific Fact", "Narrative", "Hybrid"))+
+  theme_minimal()
+```
+
+
+### **Risk perception of MMR vaccine** across all message formats
+
+```{r}
+ggplot(data, aes(x = GenConBlf, y = RskMmrVac))+
+  geom_point(aes(color = Condition), alpha = .5, position = "jitter")+
+  labs(x = "Level of general conspiracy belief",
+       y = "Risk perception toward MMR vaccine")+
+  scale_y_continuous(labels = c("Not at all\nrisky", 
+                                " ", 
+                                "Moderately\nrisky", 
+                                " ", 
+                                "Extremely\nrisky"), 
+                     breaks = 1:5, limits = c(1,5))+
+  scale_x_continuous(labels = c("None", 
+                                " ", 
+                                "Moderate", 
+                                " ", 
+                                "A lot"),
+                     breaks = 1:5, limits = c(1,5)) +
+  scale_color_manual(values = c("#9c2ea1", "#fd9301", "#601700", "#db162f"),
+                     name = "Message Type", 
+                     breaks =  c("Control", "Fact", "Narrative", "Hybrid"),
+                     labels = c("No exposure", "Scientific Fact", "Narrative", "Hybrid"))+
+  theme_minimal()
+```
+
+
+
+Demographic Information: Conspiracy Beliefs in General vs in Vaccination {.storyboard}
+===================================================================
+
+### Grouped by **age and preferred political parties** {data-commentary-width=500}
+
+```{r}
+plot6.anim <- data %>% group_by(SlfPolIdeo, age) %>% 
+  mutate(avg_GenConBlf = mean(GenConBlf, na.rm = TRUE)) %>% 
+  mutate(avg_VacConBlf = mean(VacConBlf, na.rm = TRUE)) %>%
+  ungroup() %>% 
+  drop_na(c(SlfPolIdeo, age)) %>% 
+  select(SlfPolIdeo, age, avg_GenConBlf, avg_VacConBlf) %>% 
+  pivot_longer(!c(SlfPolIdeo, age), 
+               names_to = "ConBlfTypes",
+               values_to = "score") %>%
+  mutate(ConBlfTypes = recode(ConBlfTypes, "avg_GenConBlf" = "GENERAL", "avg_VacConBlf" = "VACCINATION")) %>%   filter(SlfPolIdeo != "Other:") %>% 
+  filter(age != "18-20 years old") %>% 
+  filter(age != "51-60 years old") %>% 
+  ggplot(aes(age, score))+
+  geom_col(aes(fill = SlfPolIdeo), position = "dodge")+
+  labs(title = "Do age and supported political party influence on \nconspiracy beliefs in {closest_state}?",
+       x = "Age groups",
+       y = "Average conspiracy belief in general")+
+  scale_fill_manual(values = c("blue1", "darkmagenta", "firebrick2"),
+                     name = "Self-identified \npolitical party", 
+                     breaks =  c("Democrats", "Independents", "Republicans"),
+                     labels = c("Democrats", "Independents", "Republicans"))+
+  transition_states(ConBlfTypes,
+                  transition_length = 2,
+                  state_length = 2)+
+  theme_minimal()
+
+animate(plot6.anim, renderer = magick_renderer())
+```
+
+*************
+This animated bar chart shows the level of conspiracy beliefs in general vs. in vaccineation across age groups and self-identified political party. The initial bar charts are shown below. In the final version, there are three main changes:
+
+1) I filtered out participants who self-identified as "others: " in SlfPolIdeo variable because it is not quite meaningful for this context. I also filtered out those who identified themselves as 18-20 and 51-50 years old because there are only 3 and 7 participants, respectively. 
+
+2) Instead of using facet_wrap() function, I put these two charts into one animated chart so that people can see all the red bars rising up regardless of age groups.
+
+3) I change the color to matches with the context (i.e., self-identified political party).
+
+
+```{r}
+data %>% group_by(SlfPolIdeo, age) %>% 
+  mutate(avg_GenConBlf = mean(GenConBlf, na.rm = TRUE)) %>% 
+  mutate(avg_VacConBlf = mean(VacConBlf, na.rm = TRUE)) %>%
+  ungroup() %>% 
+  drop_na(c(SlfPolIdeo, age)) %>% 
+  select(SlfPolIdeo, age, avg_GenConBlf, avg_VacConBlf) %>% 
+  ggplot(aes(age, avg_GenConBlf))+
+  geom_col(aes(fill = SlfPolIdeo), position = "dodge")+
+  theme_minimal()
+```
+
+```{r}
+data %>% group_by(SlfPolIdeo, age) %>% 
+  mutate(avg_GenConBlf = mean(GenConBlf, na.rm = TRUE)) %>% 
+  mutate(avg_VacConBlf = mean(VacConBlf, na.rm = TRUE)) %>%
+  ungroup() %>% 
+  drop_na(c(SlfPolIdeo, age)) %>% 
+  select(SlfPolIdeo, age, avg_GenConBlf, avg_VacConBlf) %>% 
+  ggplot(aes(age, avg_VacConBlf))+
+  geom_col(aes(fill = SlfPolIdeo), position = "dodge")+
+  theme_minimal()
+```
+
+
+### Grouped by **gender** {data-commentary-width=500}
+
+```{r}
+plot4_anim <- data %>% 
+  select(GenConBlf, VacConBlf, Gender) %>% 
+  filter(Gender == c("Female", "Male")) %>% 
+  pivot_longer(!Gender, 
+               names_to = "ConBlfTypes",
+               values_to = "score") %>% 
+  mutate(ConBlfTypes = recode(ConBlfTypes, "GenConBlf" = "GENERAL", "VacConBlf" = "VACCINATION")) %>% 
+  ggplot(aes(score)) +
+  geom_density(aes(fill = Gender), color = "white", alpha = .3)+
+  labs(title = "Males vs Females:",
+       subtitle = "Who has higher conspiracy belief in {closest_state}?",
+       x = "Level of general conspiracy belief",
+       y = "Density")+
+  transition_states(ConBlfTypes,
+                  transition_length = 2,
+                  state_length = 2)+
+  theme_minimal()
+
+
+animate(plot4_anim, renderer = magick_renderer())
+```
+
+*************
+This animated density plot shows level of conspiracy beliefs in general vs. in vaccination categorized by gender (i.e., male vs. female). The initial versions displayed below are simply static density plots. I added the animation to show changes across two types of the conspiracy beliefs.
+
+```{r}
+data %>% 
+  select(GenConBlf, VacConBlf, Gender) %>% 
+  filter(Gender == c("Female", "Male")) %>% 
+  ggplot(aes(GenConBlf)) +
+  geom_density(aes(fill = Gender), color = "white", alpha = .3)+
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+```{r}
+data %>% 
+  select(GenConBlf, VacConBlf, Gender) %>% 
+  filter(Gender == c("Female", "Male")) %>% 
+  ggplot(aes(VacConBlf)) +
+  geom_density(aes(fill = Gender), color = "white", alpha = .3)+
+  theme_minimal()
+  
+```
+
+
+### Grouped by **income** {data-commentary-width=500}
+
+```{r}
+dat_plot7 <- data %>% 
+  select(GenConBlf, VacConBlf, Income) %>% 
+  drop_na(Income) %>% 
+  pivot_longer(c(VacConBlf, GenConBlf), 
+               names_to = "ConBlfTypes",
+               values_to = "score") %>% 
+  mutate(ConBlfTypes = recode(ConBlfTypes, "GenConBlf" = "GENERAL", "VacConBlf" = "VACCINATION"))
+
+dat_plot7$Income <- factor(dat_plot7$Income, levels = c("Less than $10,000", "$10,000 - $19,999", "$20,000 - $29,999", "$30,000 - $39,999", "$40,000 - $49,999", "$50,000 - $59,999", "$60,000 - $69,999", "$70,000 - $79,999", "$80,000 - $89,999", "$90,000 - $99,999", "$100,000 - $149,999", "More than $150,000", ordered = TRUE))
+
+plot7_anim <- 
+  dat_plot7 %>% 
+  ggplot(aes(score, Income))+
+  geom_boxplot(position = "dodge")+
+  geom_jitter(aes(color = Income), position = position_jitter(0.2), show.legend = FALSE)+
+  labs(title = "Does income make differences of conspiracy beliefs?",
+       subtitle = "Showing conspiracy beliefs in {closest_state}",
+       x = "Level of conspiracy beliefs")+
+  scale_x_continuous(labels = c("None", 
+                                " ", 
+                                "Moderate", 
+                                " ", 
+                                "A lot"), 
+                     breaks = 1:5, limits = c(1,5))+
+  transition_states(ConBlfTypes,
+                  transition_length = 2,
+                  state_length = 2)+
+  theme_minimal()
+
+animate(plot7_anim, renderer = magick_renderer())
+```
+
+*************
+The initial versions of this animated plot are shown below. 
+
+The differences between these two versions are:
+
+1) I factored the order of levels of "income" variable so that it is organized from low to high.
+
+2) I added geom_jitter(), besides using geom_boxplot() alone, to visualize the density of data in each level and categorized them by colors.
+
+3) I merged the two plots by gganimate() function to visualize the differences of conspiracy beliefs in general vs conspiracy beliefs in vaccination across groups of income.
+
+
+```{r}
+data %>% 
+  select(GenConBlf, VacConBlf, Income) %>% 
+  drop_na(Income) %>% 
+  
+  ggplot(aes(GenConBlf, Income))+
+  geom_boxplot(position = "dodge")+
+  theme_minimal()
+```
+
+```{r}
+data %>% 
+  select(GenConBlf, VacConBlf, Income) %>% 
+  drop_na(Income) %>% 
+  
+  ggplot(aes(VacConBlf, Income))+
+  geom_boxplot(position = "dodge")+
+  theme_minimal()
+```
+
+### Grouped by **race** {data-commentary-width=500}
+
+```{r}
+plot5_anim <- data %>% 
+  select(GenConBlf, VacConBlf, Race) %>% 
+  pivot_longer(!c(Race), 
+               names_to = "ConBlfTypes",
+               values_to = "score") %>% 
+  mutate(ConBlfTypes = recode(ConBlfTypes, "GenConBlf" = "GENERAL", "VacConBlf" = "VACCINATION")) %>% 
+  filter(!Race %in% c("NA", "Native Hawaiian or Pacific Islander", "Other:", "Two or more")) %>% 
+  drop_na(Race) %>% 
+  mutate(Race = recode(Race, "American Indian or Alaska Native" = "Native Americans", "Black or African American" = "Black", "Caucasian or White" = "White", "Asian" = "Asian")) %>% 
+  ggplot(aes(score)) +
+  geom_density(aes(fill = Race), color = "white", alpha = .4)+
+  labs(title = "Which race holds more conspiracy beliefs in {closest_state}?", 
+       x = "Level of general conspiracy belief",
+       y = "Density")+ 
+  scale_x_continuous(labels = c("None", 
+                                " ", 
+                                "Moderate", 
+                                " ", 
+                                "A lot"), 
+                     breaks = 1:5, limits = c(1,5))+
+  transition_states(ConBlfTypes,
+                  transition_length = 2,
+                  state_length = 2)+
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0))
+
+
+animate(plot5_anim, renderer = magick_renderer())
+
+```
+
+
+*************
+This animated density plot shows level of conspiracy beliefs in general vs. in vaccination categorized by race. The initial versions displayed below are simply static density plots. I added the animation to show changes across two types of the conspiracy beliefs.
+
+```{r}
+data %>% 
+  select(GenConBlf, VacConBlf, Race) %>% 
+  filter(!Race %in% c("NA", "Native Hawaiian or Pacific Islander", "Other:", "Two or more")) %>% 
+  drop_na(Race) %>% 
+  ggplot(aes(GenConBlf)) +
+  geom_density(aes(fill = Race), color = "white", alpha = .4)+
+  theme_minimal()
+```
+
+
+```{r}
+data %>% 
+  select(GenConBlf, VacConBlf, Race) %>% 
+  filter(!Race %in% c("NA", "Native Hawaiian or Pacific Islander", "Other:", "Two or more")) %>% 
+  drop_na(Race) %>% 
+  ggplot(aes(VacConBlf)) +
+  geom_density(aes(fill = Race), color = "white", alpha = .4)+
+  theme_minimal()
+```
+
+
+
+### Grouped by **education** {data-commentary-width=500}
+
+```{r}
+data_plot3 <- data %>% 
+  select(GenConBlf, VacConBlf, Edu) %>% 
+  pivot_longer(!c(Edu),
+               names_to = "ConBlfTypes",
+               values_to = "score") %>%
+  filter(!Edu %in% c("Less than a high school diploma", "Professional degree (e.g., MD, DDS, DVM)")) %>% 
+  drop_na(Edu) %>% 
+  mutate(ConBlfTypes = recode(ConBlfTypes, "GenConBlf" = "GENERAL", "VacConBlf" = "VACCINATION")) %>%
+  mutate(Edu = recode(Edu, "High school degree or equivalent (e.g. GED)" = "High school", "Some college, no degree" = "Some College", "Associate degree (e.g. AA, AS)" = "Associate's", "Bachelor's degree (e.g. BA, BS)" = "Bachelor's", "Master's degree (e.g., MA, MS, MEd)" = "Master's or Doctorate","Doctorate (e.g. PhD, EdD)" = "Master's or Doctorate")) 
+
+ 
+data_plot3$Edu <- factor(data_plot3$Edu, levels = c("High school", "Some College", "Associate's", "Bachelor's", "Master's or Doctorate"))
+
+plot3.anim <-
+  ggplot(data_plot3, aes(x = score, y = Edu))+
+  geom_boxplot(position = "dodge")+
+  geom_jitter(aes(color = Edu), position = position_jitter(0.2), show.legend = FALSE)+
+  labs(title = "Does education influence conspiracy beliefs?",
+       subtitle = "Showing conspiracy beliefs in {closest_state}",
+       x = "Level of conspiracy beliefs",
+       y = "Education")+
+  scale_x_continuous(labels = c("None", 
+                                " ", 
+                                "Moderate", 
+                                " ", 
+                                "A lot"), 
+                     breaks = 1:5, limits = c(1,5))+
+  transition_states(ConBlfTypes,
+                  transition_length = 2,
+                  state_length = 1)+
+  scale_color_viridis_d(option = "plasma")+
+  theme_minimal()
+        
+      
+animate(plot3.anim, renderer = magick_renderer())
+```
+
+*************
+The initial versions of this animated plot are shown below.
+
+The differences between these two versions include:
+
+1) I added geom_jitter(), in addition to geom_boxplot(), to visualize the density of data in each level and categorized them by colors.
+2) I factored the order of levels of “income” variable so that it is organized from low to high.
+3) I merged the two plots by gganimate() function to visualize the differences of conspiracy beliefs in general vs conspiracy beliefs in vaccination across groups of Education.
+
+
+```{r}
+data %>% 
+  select(GenConBlf, VacConBlf, Edu) %>% 
+  filter(!Edu %in% c("Less than a high school diploma", "Professional degree (e.g., MD, DDS, DVM)")) %>% 
+  drop_na(Edu) %>% 
+  ggplot(aes(GenConBlf, Edu))+
+  geom_boxplot(aes(fill = Edu), position = "dodge")+
+  scale_fill_viridis_d(option = "plasma")+
+  theme_minimal()+
+  theme(legend.position= "none")
+```
+
+
+```{r}
+data %>% 
+  select(GenConBlf, VacConBlf, Edu) %>% 
+  filter(!Edu %in% c("Less than a high school diploma", "Professional degree (e.g., MD, DDS, DVM)")) %>% 
+  drop_na(Edu) %>% 
+  ggplot(aes(VacConBlf, Edu))+
+  geom_boxplot(aes(fill = Edu), position = "dodge")+
+  scale_fill_viridis_d(option = "plasma")+
+  theme_minimal()+
+  theme(legend.position= "none")
+```
+

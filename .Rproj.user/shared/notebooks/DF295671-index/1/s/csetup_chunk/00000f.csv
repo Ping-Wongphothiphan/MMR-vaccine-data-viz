@@ -1,0 +1,17 @@
+"0","library(flexdashboard)"
+"0","library(tidyverse)"
+"0","library(gghighlight)"
+"0","library(here)"
+"0","library(dplyr)"
+"0","library(ggplot2)"
+"0","library(ggrepel)"
+"0",""
+"0","data <- read_csv(here(""data.csv""))"
+"2","[1mRows: [22m[34m438[39m [1mColumns: [22m[34m57[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m─────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m (21): Condition, Gender, Ethnicity, Race, Race_7_TEXT, Religion, Religion_8_TEXT,...
+[32mdbl[39m (36): GenConBlf, VacConBlf, InfoPros_Analytic, InfoPros_Experiential, Aff_MMR, Af..."
+"2","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."

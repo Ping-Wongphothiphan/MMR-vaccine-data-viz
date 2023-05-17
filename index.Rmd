@@ -1,0 +1,332 @@
+---
+title: "Effective Persuasion for US Parents with Vaccine Hesitancy: The Case Study of MMR Vaccination"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    social: menu
+    source_code: https://ping-wongphothiphan.github.io/EDLD652-Final_project/
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(gghighlight)
+library(here)
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+
+data <- read_csv(here("data.csv"))
+```
+
+Introduction
+=======================================
+
+Row {data-height=500}
+---------------------------------------------------------
+### **Research Background and Significance:**
+
+Vaccine hesitancy is an increasingly pressing issue in public health, as it poses a significant threat to immunization programs worldwide. In 2019, the World Health Organization (WHO) identified vaccine hesitancy as one of the top ten global health threats, underscoring the pressing need for research aimed at better understanding this phenomenon.
+
+In the United States, the measles, mumps, and rubella (MMR) vaccine has been a subject of intense debate among parents, with high levels of skepticism surrounding its use. This skepticism has contributed to the rise of measles cases in the country, with 1,282 confirmed cases reported across 31 states between January 1 and August 22, 2019, marking the highest number of cases reported in the US since 1992 and since measles was declared eliminated in 2000.
+
+Recent research has indicated that vaccine hesitancy is positively associated with belief in conspiracy theories. A large-scale global study revealed that individuals who hold more conspiracy beliefs are more likely to be hesitant about receiving vaccinations. This finding underscores the critical need for further research aimed at developing effective communication strategies that can persuade vaccine-hesitant individuals, particularly parents who have the right to decide on their child's vaccination.
+
+Studies on behavioral health have suggested that individuals are better able to make accurate judgments when information provided aligns with their patterns of information processing. Previous research has yielded mixed findings regarding the effectiveness of scientific versus narrative health messages, which promote information processing through cognitive and emotional routes, respectively. Thus, this study not only addresses gaps in the existing literature but also represents the first randomized controlled trial study to test the effectiveness of messages aimed at vaccine-hesitant parents (VHPs) with conspiracy beliefs.
+
+**Note.** This dashboard focuses on data visualization. Statistical significance (p < 0.5) cannot be assumed from the graphs. Inferential statistical analysis has been conducted for all findings reported on this dashboard.
+
+
+Row {data-height=500}
+---------------------------------------------------------
+
+### **Research Objectives:**
+
+This study aims to investigate whether different formats of vaccination promotion message influence:
+
+a) intention to accept MMR vaccination among general VHPs
+b) positive affect (e.g., emotion) toward MMR vaccination among general VHPs
+c) intention to accept MMR vaccination among VHPs with conspiracy belief
+d) positive affect toward MMR vaccination among VHPs with conspiracy beliefs
+
+
+### **Research Method:**
+
+This study is an online experiment targeting only participants who identify themselves as:
+
+1) being a parent of a child aged 0-6 year-old
+2) residing in the U.S.
+3) thinking that MMR vaccine or vaccines in general is unsafe. 
+
+A total of 438 participants were randomly assigned to read one of the following message formats:
+
+1)	Control (n = 107)—no exposure to any message
+2)	Fact (n = 111)—an article providing scientific facts and statistical information
+3)	Narrative (n = 111)—a story of a mother who successfully vaccinate her child
+4)	Hybrid (n = 109)—a story of a mother who successfully vaccinate her child, coupled up with scientific facts and statistical information.
+
+
+Findings for VHPs in general
+=======================================
+
+Row {data-height=550}
+---------------------------------------------------------
+
+### **MMR vaccination intention among VHPs in general**
+
+```{r}
+data %>% 
+  ggplot(aes(VacIntMMR, Condition, fill = Condition))+
+  geom_boxplot(position = "dodge", show.legend = FALSE)+
+  stat_summary(fun.x = mean, geom = "point", shape = 20, size = 5, show.legend = FALSE)+
+  labs(x = "MMR vaccination intention",
+       y = "Message condition")+
+  scale_x_continuous(labels = c("Definitely\nNot", " ", "Maybe\nMaybe not", " ", "Definitely\nWill"),
+                     breaks = 1:5, limits = c(1,5))+
+  theme_minimal()
+```
+
+
+
+### **Positive affect toward MMR vaccination among VHPs in general**
+
+```{r}
+data %>% 
+  ggplot(aes(Aff_MMR, Condition, fill = Condition))+
+  geom_boxplot(position = "dodge", show.legend = FALSE)+
+  stat_summary(fun.x = mean, geom = "point", shape = 20, size = 5, show.legend = FALSE)+
+  labs(x = "Affect toward MMR vaccination",
+       y = "Message condition")+
+  scale_x_continuous(labels = c("Extremely\nNegative", " ", "Neutral", " ", "Extremely\nPositive"),
+                     breaks = 1:5, limits = c(1,5))+
+  scale_fill_manual(values = c("#9c2ea1", "#fd9301", "#601700", "#db162f"),
+                     name = "Message Type", 
+                     breaks =  c("Control", "Fact", "Narrative", "Hybrid"),
+                     labels = c("No exposure", "Scientific Fact", "Narrative", "Hybrid"))+
+  theme_minimal()
+```
+
+Row {data-height=450}
+---------------------------------------------------------
+
+### 
+
+**Omnibus test**
+
+One-way ANOVA identified a significant difference between experimental conditions on three outcomes related to vaccination tendencies with small effect sizes on MMR vaccination intention, F(3, 433) = 3.493, p = .016, η2 = 0.024, and positive affect toward MMR vaccination, F(3, 434) = 3.801, p = .010, η2 = 0.026. 
+  
+**Post hoc analysis with Bonferroni adjustment**
+
+*Intention to have their child vaccinated with MMR vaccine:*
+
+- The hybrid message (M = 3.51) increased MMR vaccination intention compared to no message exposure (M = 3.02), but it was not significantly different from fact (M = 3.23) and narrative (M = 3.29) messages.
+
+- Fact and narrative messages did not significantly enhance vaccination intention compared to no message exposure.
+
+- Fact and narrative messages were not significantly different from each other in enhancing vaccination intention.
+
+
+*Positive affect (i.e., emotion) toward MMR vaccination:*
+
+- The hybrid message (M = 3.50) resulted in greater positive affect toward MMR vaccination compared to no message exposure (M = 3.03).
+
+- The hybrid message was not significantly different from fact (M = 3.23) and narrative(M = 3.28) messages in increasing positive affect.
+
+- Fact and narrative messages did not significantly contribute to greater positive affect compared to no message exposure. Also, these two conditions were not significantly different from each other in enhancing positive affect.
+
+
+
+Findings for VHPs with conspiracy beliefs
+=======================================
+
+Row {data-height=550}
+---------------------------------------------------------
+
+### **MMR vaccination intention among VHPs with conspiracy beliefs**
+
+```{r}
+data %>% ggplot(aes(GenConBlf, VacIntMMR))+
+  geom_point(aes(color = Condition), alpha = .5, position = "jitter")+
+  geom_smooth(aes(color = Condition), method = "lm", se = FALSE)+
+  labs(x = "Level of general conspiracy belief",
+       y = "MMR vaccination intention")+
+  scale_y_continuous(labels = c("Definitely\nwill not", " ", "Maybe,\n Maybe not", " ", "Definitely\nwill"), 
+                     breaks = 1:5, limits = c(1,5))+
+  scale_x_continuous(labels = c("None", " ", "Moderate", " ", "A lot"),
+                     breaks = 1:5, limits = c(1,5))+
+  scale_color_manual(values = c("orchid", "salmon", "darkturquoise", "chartreuse3"),
+                     name = "Message Type", 
+                     breaks =  c("Control", "Fact", "Narrative", "Hybrid"),
+                     labels = c("No exposure", "Scientific Fact", "Narrative", "Hybrid"))+
+  theme_minimal()
+```
+
+### **Positive affect toward MMR vaccination among VHPs with conspiracy beliefs**
+
+```{r}
+ggplot(data, aes(x = GenConBlf, y = Aff_MMR))+
+  geom_point(aes(color = Condition), alpha = .5, position = "jitter")+
+  geom_smooth(aes(color = Condition), method = "lm", se = FALSE)+
+  labs(x = "Level of general conspiracy belief",
+       y = "Positive affect toward MMR vaccine")+
+  scale_y_continuous(labels = c("Extremely\nnegative", 
+                                " ", 
+                                "Neutral", 
+                                " ", 
+                                "Extremely\npositive"), 
+                     breaks = 1:5, limits = c(1,5))+
+  scale_x_continuous(labels = c("None", 
+                                " ", 
+                                "Moderate", 
+                                " ", 
+                                "A lot"),
+                     breaks = 1:5, limits = c(1,5)) +
+  scale_color_manual(values = c("#9c2ea1", "#fd9301", "#601700", "#db162f"),
+                     name = "Message Type", 
+                     breaks =  c("Control", "Fact", "Narrative", "Hybrid"),
+                     labels = c("No exposure", "Scientific Fact", "Narrative", "Hybrid"))+
+  theme_minimal()
+```
+
+Row {data-height=450}
+---------------------------------------------------------
+
+###
+
+**Multiple regression analysis**
+
+Using the level of general conspiracy belief (GBC) as a moderator, GBC was found to interact with narrative messages in predicting two outcomes:
+
+- MMR vaccination intention [F(7, 429) = 4.246, p < .001, adjusted R2 = .050, b = -.400, SE = 0.199, p = -.045]
+
+- Positive affect toward MMR [F(7, 430) = 4.288, p < .001, adjusted R2 = .050, b = -0.371, SE = 0.186, p = .047].
+
+**Johnson-Neyman (JN) Analysis for local interaction**
+
+*Intention to have their child vaccinated with MMR vaccine:*
+
+- JN analysis suggests that, compared to other types of messages, narrative message greater predicts MMR vaccination intention for individuals whose GBC is at -1SD (2.730, b = 0.60, SE = 0.21, p = .00) and at the mean (3.461, b = 0.31, SE = 0.15, p = .04). 
+
+- In other words, exposure to narrative message could effectively increase vaccination intention among individuals who hold a low to average amount of general conspiracy beliefs.	
+
+*Positive affect (i.e., emotion) toward MMR vaccination:*
+
+- JN analysis suggests that, compared to other message types, narrative message greater predicts positive affect toward MMR vaccination at the levels of -1SD (b = 0.56, SE = 0.19, p = .00) and the mean (b = 0.29, SE = 0.14, p = .04). 
+
+- In other words, exposure to narrative message significantly raises positive affect toward MMR vaccination among individuals with low to average GBC.
+
+
+Demographic Information
+===================================================================
+
+Row {data-height=500}
+---------------------------------------------------------
+
+### **Racial composition**
+```{r}
+data %>%
+  select(Race) %>%
+  drop_na() %>%
+  mutate(Race = recode(Race, "American Indian or Alaska Native" = "American Indian",
+                      "Asian" = "Asian",
+                      "Black or African American" = "Black",
+                      "Caucasian or White" = "White",
+                      "Native Hawaiian or Pacific Islander" = "Pacific Islander",
+                      "Other:" = "Other",
+                      "Two or more" = "Two or more")) %>%
+  group_by(Race) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(perc = n/sum(n))%>% 
+  arrange(perc) %>% 
+  mutate(labels = scales::percent(perc)) %>% 
+  ggplot(aes(x = "", y = perc, fill=Race))+
+  geom_col()+
+  coord_polar(theta = "y")+
+  geom_label_repel(aes(y =perc, label = labels),
+                   size = 4,position = "stack", show.legend = FALSE, segmemt.color = "transparent") +
+  scale_fill_brewer(palette = "Set2")+
+  theme_void()+
+  theme(plot.margin = margin(0,0,0,0),
+        legend.text = element_text(size = 15), 
+        legend.title = element_text (size = 15))
+  
+```
+
+### **Level of income across genders**
+
+```{r}
+data %>%
+  select(Income, Gender) %>%
+  drop_na() %>%
+  group_by(Income, Gender) %>% 
+  filter(Gender != "Non-binary / third gender") %>%
+  filter(Gender != "Other:") %>%
+  filter(Gender != "Prefer not to say") %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(n = n) %>%
+  mutate(Income = fct_relevel(Income, "Less than $10,000", "$10,000 - $19,999", "$20,000 - $29,999", "$30,000 - $39,999", "$40,000 - $49,999", "$50,000 - $59,999", "$60,000 - $69,999", "$70,000 - $79,999", "$80,000 - $89,999", "$90,000 - $99,999", "$100,000 - $149,999", "More than $150,000")) %>% 
+  ggplot(aes(x = n, y = Income, fill = Gender))+
+  geom_col(position = "dodge")+
+  labs(x = "Numbers of participants",
+       y = "Income",
+       size = 15)+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 15),
+        legend.text = element_text(size = 15), 
+        legend.title = element_text (size = 15))
+```
+
+Row {data-height=500}
+---------------------------------------------------------
+
+### **Education**
+```{r}
+data %>%
+  select(Edu) %>%
+  drop_na() %>%
+  group_by(Edu) %>% 
+  filter(Edu != "Less than a high school diploma") %>%
+  mutate(Edu = recode(Edu, "High school degree or equivalent (e.g. GED)" = "High school", "Some college, no degree" = "Some college", "Associate degree (e.g. AA, AS)" = "Associate's", "Bachelor's degree (e.g. BA, BS)" = "Bachelor's", "Professional degree (e.g., MD, DDS, DVM)" = "Professional", "Master's degree (e.g., MA, MS, MEd)" = "Master's or Doctorate","Doctorate (e.g. PhD, EdD)" = "Master's or Doctorate")) %>% 
+  count(Edu) %>% 
+  ungroup() %>% 
+  mutate(n = n) %>%
+  mutate(Edu = fct_relevel(Edu, "High school", "Some college", "Associate's", "Bachelor's", "Professional", "Master's or Doctorate")) %>% 
+  ggplot(aes(x = n, y = Edu, fill = Edu))+
+  geom_col()+
+  coord_flip()+
+  geom_text(aes(label = n), vjust = -0.5)+
+  labs(x = "Numbers of participants",
+       y = "Degree of Education",
+       fill = "Degree")+
+  theme_minimal()+
+  theme(axis.text.x = element_blank(),
+        axis.text = element_text(size = 15),
+        legend.text = element_text(size = 15),
+        legend.title = element_text (size = 15))
+```
+
+### **Marital status**
+
+```{r}
+data %>%
+  select(marital) %>%
+  drop_na() %>%
+  count(marital) %>% 
+  mutate(perc = n/sum(n))%>% 
+  arrange(perc) %>% 
+  mutate(labels = scales::percent(perc)) %>% 
+  ggplot(aes(x = "", y = perc, fill=marital))+
+  geom_col()+
+  coord_polar(theta = "y")+
+   geom_label_repel(aes(y =perc, label = labels),
+                   size = 4,position = "stack", show.legend = FALSE, segmemt.color = "transparent") +
+  scale_fill_brewer(palette = "Pastel1")+
+  theme_void()+
+  labs(fill = "Marital status")+
+  theme(plot.margin = margin(0,0,0,0),
+        legend.text = element_text(size = 15),
+        legend.title = element_text (size = 15))
+```

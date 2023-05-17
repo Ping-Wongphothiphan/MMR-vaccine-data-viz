@@ -1,0 +1,20 @@
+"0","data %>%
+  select(marital) %>%
+  drop_na() %>%
+  count(marital) %>% 
+  mutate(perc = n/sum(n))%>% 
+  arrange(perc) %>% 
+  mutate(labels = scales::percent(perc)) %>% 
+  ggplot(aes(x = """", y = perc, fill=marital))+
+  geom_col()+
+  coord_polar(theta = ""y"")+
+   geom_label_repel(aes(y =perc, label = labels),
+                   size = 4,position = ""stack"", show.legend = FALSE, segmemt.color = ""transparent"") +
+  scale_fill_brewer(palette = ""Pastel1"")+
+  theme_void()+
+  labs(fill = ""Marital status"")+
+  theme(plot.margin = margin(0,0,0,0),
+        legend.text = element_text(size = 15),
+        legend.title = element_text (size = 15))
+"
+"2","Warning: [38;5;255mIgnoring unknown parameters: `segmemt.colour`[39m"
